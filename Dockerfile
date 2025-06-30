@@ -10,7 +10,8 @@ RUN apt-get update && \
     ca-certificates \
     curl \
     tar \
-    gzip
+    gzip && \
+    rm -rf /var/lib/apt/lists/*
 
 # Клонирование и настройка vcpkg
 RUN git clone https://github.com/Microsoft/vcpkg.git && \
@@ -22,10 +23,11 @@ WORKDIR /app
 COPY . .
 
 # Сборка зависимостей и проекта
-RUN cd vcpkg && ./vcpkg install drogon jsoncpp
+RUN cd /vcpkg && ./vcpkg install drogon jsoncpp  # Используем абсолютный путь
+
 RUN mkdir -p build && \
     cd build && \
-    cmake -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake .. && \
+    cmake -DCMAKE_TOOLCHAIN_FILE=/vcpkg/scripts/buildsystems/vcpkg.cmake .. && \
     make
 
 # Финальный образ
