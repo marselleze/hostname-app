@@ -14,7 +14,6 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update
-          # Добавляем curl, tar, gzip и другие необходимые утилиты
           apt-get install -y build-essential cmake git gcc g++ unzip curl tar gzip pkg-config
 
       - name: Setup vcpkg
@@ -27,6 +26,7 @@ jobs:
         run: |
           $VCPKG_ROOT/vcpkg install drogon jsoncpp gtest
 
+      # Важно: кэширование ПОСЛЕ установки зависимостей
       - name: Cache vcpkg
         uses: actions/cache@v3
         with:
@@ -34,6 +34,16 @@ jobs:
           key: ${{ runner.os }}-vcpkg-${{ hashFiles('CMakeLists.txt') }}
           restore-keys: |
             ${{ runner.os }}-vcpkg-
+
+      # Проверяем наличие файлов
+      - name: Verify source files
+        run: |
+          echo "Current directory: $(pwd)"
+          ls -la
+          test -f main.cpp || exit 1
+          test -f handler.cpp || exit 1
+          test -f handler.h || exit 1
+          test -f tests/handler_test.cpp || exit 1
 
       - name: Configure CMake
         run: |
