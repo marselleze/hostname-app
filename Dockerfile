@@ -7,7 +7,10 @@ RUN apt-get update && \
     build-essential \
     cmake \
     git \
-    ca-certificates
+    ca-certificates \
+    curl \
+    tar \
+    gzip
 
 # Клонирование и настройка vcpkg
 RUN git clone https://github.com/Microsoft/vcpkg.git && \
