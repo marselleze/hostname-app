@@ -1,10 +1,6 @@
 name: CI/CD Pipeline
 
-on:
-  push:
-    branches: [main, dev]
-  pull_request:
-    branches: [main]
+on: [push, pull_request]
 
 jobs:
   build-and-test:
@@ -15,10 +11,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install system dependencies
+      - name: Install dependencies
         run: |
           apt-get update
-          apt-get install -y build-essential cmake git gcc g++ unzip
+          # Добавляем curl, tar, gzip и другие необходимые утилиты
+          apt-get install -y build-essential cmake git gcc g++ unzip curl tar gzip pkg-config
 
       - name: Setup vcpkg
         run: |
@@ -28,16 +25,23 @@ jobs:
 
       - name: Install project dependencies
         run: |
-          $VCPKG_ROOT/vcpkg install drogon jsoncpp
+          $VCPKG_ROOT/vcpkg install drogon jsoncpp gtest
+
+      - name: Cache vcpkg
+        uses: actions/cache@v3
+        with:
+          path: vcpkg
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('CMakeLists.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
 
       - name: Configure CMake
         run: |
           cmake -B build -S . \
-            -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake \
-            -DCMAKE_BUILD_TYPE=Release
+            -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
 
       - name: Build project
-        run: cmake --build build --config Release -- -j $(nproc)
+        run: cmake --build build -- -j $(nproc)
 
       - name: Run tests
         run: |
