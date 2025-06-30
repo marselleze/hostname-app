@@ -26,7 +26,7 @@ WORKDIR /app
 COPY . .
 
 # Сборка зависимостей и проекта
-RUN cd /vcpkg && ./vcpkg install drogon jsoncpp  # Используем абсолютный путь
+RUN cd /vcpkg && ./vcpkg install drogon jsoncpp gtest  # Используем абсолютный путь
 
 RUN mkdir -p build && \
     cd build && \
