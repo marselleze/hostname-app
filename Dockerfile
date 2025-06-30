@@ -10,6 +10,9 @@ RUN apt-get update && \
     ca-certificates \
     curl \
     tar \
+    zip \
+    unzip \
+    pkg-config \
     gzip && \
     rm -rf /var/lib/apt/lists/*
 
